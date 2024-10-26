@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>لعبة توصيل الكلمات المتضادة</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #FFF7CD;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    h1 {
+      color: #FF6F61;
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    .game-container {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      margin-bottom: 20px;
+    }
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .word-box {
+      padding: 10px;
+      width: 120px; /* عرض أكبر */
+      height: 120px; /* ارتفاع أكبر */
+      background-color: #FFD6A5;
+      color: #333;
+      font-weight: bold;
+      cursor: pointer;
+      border: 2px solid #F25F5C;
+      text-align: center;
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .word-box img {
+      width: 60px; /* تكبير الصورة قليلاً */
+      height: 60px;
+      margin-top: 8px;
+    }
+    .word-box:hover {
+      transform: scale(1.1);
+      background-color: #FFB6C1;
+    }
+    #result {
+      font-size: 24px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>لعبة توصيل الكلمات المتضادة</h1>
+  <div class="game-container">
+    <!-- العمود الأول: الكلمات الأساسية مع الصور -->
+    <div class="column" id="wordsColumn">
+      <div class="word-box" data-word="big">
+        Big
+        <img src="images/big.png" alt="Big">
+      </div>
+      <div class="word-box" data-word="strong">
+        Strong
+        <img src="images/strong.png" alt="Strong">
+      </div>
+      <div class="word-box" data-word="quiet">
+        Quiet
+        <img src="images/quiet.png" alt="Quiet">
+      </div>
+      <div class="word-box" data-word="long">
+        Long
+        <img src="images/long.png" alt="Long">
+      </div>
+    </div>
+
+    <!-- العمود الثاني: الكلمات المتضادة مع الصور -->
+    <div class="column" id="oppositesColumn">
+      <div class="word-box" data-word="small">
+        Small
+        <img src="images/small.png" alt="Small">
+      </div>
+      <div class="word-box" data-word="weak">
+        Weak
+        <img src="images/weak.png" alt="Weak">
+      </div>
+      <div class="word-box" data-word="noisy">
+        Noisy
+        <img src="images/noisy.png" alt="Noisy">
+      </div>
+      <div class="word-box" data-word="short">
+        Short
+        <img src="images/short.png" alt="Short">
+      </div>
+    </div>
+  </div>
+
+  <button id="checkButton" class="btn btn-primary">تحقق</button>
+  <div id="result"></div>
+
+  <script>
+    const correctPairs = {
+      "big": "small",
+      "strong": "weak",
+      "quiet": "noisy",
+      "long": "short"
+    };
+
+    let selectedWord = null;
+
+    // وظيفة نطق الكلمة
+    function speakWord(word) {
+      const utterance = new SpeechSynthesisUtterance(word);
+      utterance.lang = 'en-US';
+      speechSynthesis.speak(utterance);
+    }
+
+    // إضافة الأصوات والنقرات
+    document.querySelectorAll('.word-box').forEach(wordBox => {
+      wordBox.addEventListener('click', () => {
+        const word = wordBox.dataset.word;
+        speakWord(word); // تشغيل نطق الكلمة عند الضغط
+
+        if (!selectedWord) {
+          selectedWord = wordBox;
+          wordBox.style.backgroundColor = "#98FB98";
+        } else {
+          // تحقق من التوصيل
+          const correctMatch = correctPairs[selectedWord.dataset.word] === word;
+          if (correctMatch) {
+            wordBox.style.backgroundColor = "#98FB98";
+            selectedWord.style.backgroundColor = "#98FB98";
+          } else {
+            wordBox.style.backgroundColor = "#FFB6C1";
+            selectedWord.style.backgroundColor = "#FFD6A5";
+          }
+          selectedWord = null;
+        }
+      });
+    });
+
+    // زر "تحقق" للتحقق من صحة التوصيل
+    document.getElementById('checkButton').addEventListener('click', () => {
+      const correctlyMatched = Array.from(document.querySelectorAll('.word-box'))
+        .every(wordBox => wordBox.style.backgroundColor === "rgb(152, 251, 152)");
+      const result = document.getElementById('result');
+      
+      if (correctlyMatched) {
+        const audio = new Audio('sounds/check.mp3'); // إضافة صوت عند الإجابة الصحيحة
+        audio.play();
+        result.textContent = 'مبروك! التوصيل صحيح! 🎉';
+        result.style.color = 'green';
+      } else {
+        result.textContent = 'حاول مرة أخرى! ❌';
+        result.style.color = 'red';
+      }
+    });
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
